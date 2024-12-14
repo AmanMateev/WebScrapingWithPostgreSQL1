@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from database_connection import cursor
 
 targettedData = []
 amountOfPages = 50
