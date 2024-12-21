@@ -2,6 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 from database_connection import cursor
 
+
+
+
+
+
+
 targettedData = []
 amountOfPages = 50
 amountOfCategories = 51 
@@ -35,7 +41,7 @@ for i in range(amountOfPages + 1):
 
 # print(targettedData)
 # print("-------------------------------------------------------")
-# print(f"amount of scrapped elements: {len(targettedData)}")
+print(f"amount of scrapped elements: {len(targettedData)}")
 
 
 # print("------Categories--------")
@@ -75,7 +81,7 @@ for link_ in links:
     genreTitle = soup.select("div.page-header h1")
     listOfTitles = clean_results(soup.select("h3 a"))
     booksCollections[genreTitle[0].text] = listOfTitles
-    print(booksCollections)
+    # print(booksCollections)
 
 
 

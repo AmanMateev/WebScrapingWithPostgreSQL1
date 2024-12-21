@@ -1,3 +1,7 @@
+import os
+
+os.add_dll_directory(r"C:\Program Files\PostgreSQL\16\bin")
+
 import psycopg2
 
 try:
@@ -14,4 +18,5 @@ except psycopg2.Error:
 
 else:
     cursor = conn.cursor()
+    
     
