@@ -8,6 +8,8 @@ from database_connection import cursor
 
 
 
+#==========================================================================================================================
+
 targettedData = []
 amountOfPages = 50
 amountOfCategories = 51 
@@ -34,13 +36,13 @@ for i in range(amountOfPages + 1):
 
     for itemPrice, itemAvailability,title in zip(price,availability,name):
         bufferList = []
-        bufferList.append(itemPrice.text.lstrip("Â"))
+        bufferList.append(float(itemPrice.text.lstrip("Â£")))
         bufferList.append(itemAvailability.text.strip())
         bufferList.append(title.text)
         targettedData.append(bufferList)
 
-# print(targettedData)
-# print("-------------------------------------------------------")
+print(targettedData)
+print("-------------------------------------------------------")
 print(f"amount of scrapped elements: {len(targettedData)}")
 
 
