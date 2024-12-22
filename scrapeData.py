@@ -2,24 +2,55 @@ import requests
 from bs4 import BeautifulSoup
 from database_connection import cursor
 
+#Получение чистого текста, без тегов html, в который они обернуты. BS возвращает текст с тегами, в которые они обернуты
+def clean_results(list):
+    cleaned_list = []
+    for listItem in list:
+        cleaned_list.append(listItem.text)
+    return cleaned_list
+
+#Используем landing page сайта, чтобы получить список жанров, которые есть на сайте, для формирование ссылок на страницу каждого жанра
+landingPageLink = "https://books.toscrape.com/index.html"
+
+landingPageHtml = requests.get(landingPageLink).text
+soup = BeautifulSoup(landingPageHtml,'lxml')
+
+categories = soup.select('ul.nav-list li ul li a')
+
+formattedCategories =[]
+
+for genre in categories:
+    formattedCategories.append(genre.text.strip())
+
+
+for index, genre in enumerate(formattedCategories, start= 2):
+    genre_link = "https://books.toscrape.com/catalogue/category/books/"
+    if " " in genre:
+        splitted_genre = "-".join(genre.lower().split())
+        genre_link = genre_link + splitted_genre + f"_{index}" + "/index.html"
+        genrePageHtml = requests.get(genre_link).text
+        soup = BeautifulSoup(genrePageHtml,'lxml')
+
+        
+    else:
+        genre_link = genre_link + genre.lower() + f'_{index}' + "/index.html"
+        genrePageHtml = requests.get(genre_link).text
+        soup = BeautifulSoup(genrePageHtml,'lxml')
+
+        
 
 
 
 
 
-
-#==========================================================================================================================
+#=============================Старый код (не актуальный)============================================
 
 targettedData = []
 amountOfPages = 50
 amountOfCategories = 51 
 
 
-def clean_results(list):
-    cleaned_list = []
-    for listItem in list:
-        cleaned_list.append(listItem.text)
-    return cleaned_list
+
 
 for i in range(amountOfPages + 1):
     link = "https://books.toscrape.com/catalogue/page-" + str(i) + ".html"
