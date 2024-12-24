@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import psycopg2
 from database_connection import cursor
 from database_connection import conn
 
@@ -42,7 +41,7 @@ def storeBooks(booksInfo1):
     try:
         cursor.executemany(queryToDB,booksInfo1)
         print("Data added successfully!")
-    except psycopg2.Error as e:
+    except Exception as e:
         print(f"Error during executemany: {e}")
         conn.rollback()
     else:
@@ -77,7 +76,7 @@ for index, genre in enumerate(formattedCategories, start= 2):
     else:
         genre_link = genre_link + genre.lower() + f'_{index}' + "/index.html"
         bookInfo = dataExtractionURL(genre_link)
-        storeBooks(storeBooks)
+        storeBooks(bookInfo)
 
         
 #Мне не нравится, что используется одна и та же переменная bookinfo, данные по сути ни где не фиксируется в промежутке, не хорошо
@@ -85,78 +84,7 @@ for index, genre in enumerate(formattedCategories, start= 2):
 
 
 
-#=============================Старый код (не актуальный)============================================
 
-# targettedData = []
-# amountOfPages = 50
-# amountOfCategories = 51 
-
-
-
-
-# for i in range(amountOfPages + 1):
-#     link = "https://books.toscrape.com/catalogue/page-" + str(i) + ".html"
-#     htmlPage = requests.get(link).text
-
-#     soup = BeautifulSoup(htmlPage,"lxml")
-
-#     price = soup.find_all('p', class_= "price_color")
-#     availability = soup.find_all('p',class_ = "instock availability")
-
-#     name = soup.select('h3 a')
-
-
-
-#     for itemPrice, itemAvailability,title in zip(price,availability,name):
-#         bufferList = []
-#         bufferList.append(float(itemPrice.text.lstrip("Â£")))
-#         bufferList.append(itemAvailability.text.strip())
-#         bufferList.append(title.text)
-#         targettedData.append(bufferList)
-
-# print(targettedData)
-# print("-------------------------------------------------------")
-# print(f"amount of scrapped elements: {len(targettedData)}")
-
-
-# # print("------Categories--------")
-
-
-# categories = soup.select('ul.nav-list li ul li a')
-
-# cleaned_categories = []
-
-# for genre in categories:
-#     cleaned_categories.append(genre.text.strip())
-
-# # print(cleaned_categories)
-
-# # print("---------sorted by categories-------------")
-
-# links = []
-
-
-# for index, genre in enumerate(cleaned_categories, start= 2):
-#     genre_link = "https://books.toscrape.com/catalogue/category/books/"
-#     if " " in genre:
-#         splitted_genre = "-".join(genre.lower().split())
-#         genre_link = genre_link + splitted_genre + f"_{index}" + "/index.html"
-#         links.append(genre_link)
-#     else:
-#         genre_link = genre_link + genre.lower() + f'_{index}' + "/index.html"
-#         links.append(genre_link)
-
-# # print(links)
-
-# booksCollections = {}
-
-# for link_ in links:
-#     htmlPage = requests.get(link_).text
-#     soup = BeautifulSoup(htmlPage,"lxml")
-#     genreTitle = soup.select("div.page-header h1")
-#     listOfTitles = clean_results(soup.select("h3 a"))
-#     booksCollections[genreTitle[0].text] = listOfTitles
-#     # print(booksCollections)
 
 
 
