@@ -5,11 +5,11 @@ from database_connection import conn
 
 
 
-#Функция, которая преобразует значения In stock в булевое значение (мне не нравится название переменной)
+#converts "In stock" value to bool 
 def isInStock(checkAvailability):
     return checkAvailability == "In stock"
      
-
+#forms link to specific genre page
 def formLinkToPage(index,genre):
     genre_link = "https://books.toscrape.com/catalogue/category/books/"
     if " " in genre:
@@ -20,7 +20,7 @@ def formLinkToPage(index,genre):
         genre_link = genre_link + genre.lower() + f'_{index}' + "/index.html"
         return genre_link
 
-
+#getting link to genre page, retriving data from page
 def dataExtractionURL(genrePageLink):
     try:
         bookInfo1 = []
@@ -47,6 +47,7 @@ def dataExtractionURL(genrePageLink):
     except Exception as e:
         print(f'Error extracting data from URL{e}')
 
+#checking that data is valid
 def validateBookData(book):
     title, price, availability, genre = book
     return (
@@ -55,7 +56,8 @@ def validateBookData(book):
         isinstance(availability, bool) and
         isinstance(genre, str)
     )  
-        
+
+#checking validation of values, then write it to database       
 def storeBooks(bookData):
     validBooks = [book for book in bookData if validateBookData(book)]
     if not validBooks:
@@ -74,41 +76,32 @@ def storeBooks(bookData):
     else:
         conn.commit()
 
+def main():
+    #Using landing page to get genres which website has, in order to form links for each page with specific genre
+    landingPageLink = "https://books.toscrape.com/index.html"
 
-     
+    landingPageHtml = requests.get(landingPageLink).text
+    soup = BeautifulSoup(landingPageHtml,'lxml')
 
+    categories = soup.select('ul.nav-list li ul li a')
 
-#Используем landing page сайта, чтобы получить список жанров, которые есть на сайте, для формирование ссылок на страницу каждого жанра
-landingPageLink = "https://books.toscrape.com/index.html"
+    formattedCategories =[]
 
-landingPageHtml = requests.get(landingPageLink).text
-soup = BeautifulSoup(landingPageHtml,'lxml')
+    for genre in categories:
+        formattedCategories.append(genre.text.strip())
 
-#Получим жанры книг, присутствующих на сайте, чтобы сформировать ссылки на страницы книг по жанрам
-categories = soup.select('ul.nav-list li ul li a')
-
-formattedCategories =[]
-
-for genre in categories:
-    formattedCategories.append(genre.text.strip())
-
-#Формирование ссылок на страницы книг по жанрам, передача их в функцию для изъятия данных со страниц
-for index, genre in enumerate(formattedCategories, start= 2):
+    #forming links for gere pages, getting targetted data from each page, store it to table in database 
+    for index, genre in enumerate(formattedCategories, start= 2):
         genre_link = formLinkToPage(index,genre)
         bookInfo = dataExtractionURL(genre_link)
         if bookInfo:
             storeBooks(bookInfo)
 
 
-def main():
-    #Используем landing page сайта, чтобы получить список жанров, которые есть на сайте, для формирование ссылок на страницу каждого жанра
-    landingPageLink = "https://books.toscrape.com/index.html"
-    
 
 
-
-
-
+if __name__ == "__main__":
+    main()
 
 
 
